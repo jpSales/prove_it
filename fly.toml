@@ -1,0 +1,19 @@
+# fly.toml
+app = "prove-it" 
+primary_region = "gru"
+console_command = "/bin/bash"
+
+# Esta seção [mounts] diz ao Fly.io para conectar nosso disco persistente
+# na pasta /app/data dentro do contêiner.
+[mounts]
+  source = "bot_data"
+  destination = "/app/data"
+
+# Esta seção [processes] informa ao Fly que este é um processo 'app'
+# que não deve ser interrompido se não responder a verificações HTTP.
+# O 'internal_port' é removido, e health checks são desativados.
+[processes]
+  app = "" # Deixe em branco para usar o CMD do Dockerfile
+
+# REMOVEMOS COMPLETAMENTE A SEÇÃO [http_service] OU [[services]]
+# Isso impede que o Fly.io tente tratar seu bot como um site.

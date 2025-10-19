@@ -1,0 +1,16 @@
+# flyctl launch added from .gitignore
+# Ambiente Virtual
+**\venv
+
+# Banco de dados local (o da nuvem será separado)
+**\data\bot.db
+**\data\bot.db-journal
+
+# Arquivos de cache do Python
+**\__pycache__
+**\*.pyc
+
+# Arquivos de IDE (opcional, mas bom)
+**\.vscode
+**\.idea
+fly.toml
