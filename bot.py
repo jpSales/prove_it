@@ -1491,5 +1491,44 @@ def main() -> None:
     application.run_polling()
 
 
+# Cria a aplicação web
+app = Flask(__name__)
+
+
+@app.route("/")
+def health_check():
+    """Rota principal que o pinger (UptimeRobot) vai visitar."""
+    logger.info("Ping do servidor web recebido!")
+    return "Estou vivo!", 200
+
+
+def run_bot():
+    """
+    Função wrapper que simplesmente chama a função 'main' original do bot.
+    'main()' é a função que você já tem e que faz application.run_polling().
+    """
+    try:
+        main()
+    except Exception as e:
+        logger.critical(f"Erro crítico na thread do bot: {e}", exc_info=True)
+
+
+# ---- Bloco de Inicialização Modificado ----
+
 if __name__ == "__main__":
-    main()
+
+    # 1. Inicia o Bot (main()) em uma Thread separada
+    # Isso permite que o bot fique rodando em background
+    logger.info("Iniciando a thread do Bot Telegram...")
+    bot_thread = threading.Thread(target=run_bot)
+    bot_thread.daemon = (
+        True  # Permite que o programa feche se a thread principal fechar
+    )
+    bot_thread.start()
+
+    # 2. Inicia o Servidor Web (Flask) na Thread principal
+    # O Render espera que um 'Web Service' se conecte a uma porta.
+    # Ele nos diz qual porta usar através da variável de ambiente $PORT.
+    port = int(os.environ.get("PORT", 10000))
+    logger.info(f"Iniciando o servidor web (Flask) na porta {port}...")
+    app.run(host="0.0.0.0", port=port)
